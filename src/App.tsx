@@ -8,8 +8,7 @@ import { Volume2, VolumeX } from 'lucide-react'; // Iconos de sonido
 // --- CONFIGURACIÓN ---
 const STRIPE_LINK = "https://buy.stripe.com/test_cNi14gfvgfa16uJ3Cq0Fi00";
 // Música ambiental espacial (Royalty Free)
-const MUSIC_URL = "https://cdn.pixabay.com/download/audio/2022/10/25/audio_2014816990.mp3?filename=space-atmosphere-125346.mp3"; 
-// ---------------------
+const MUSIC_URL = "https://assets.mixkit.co/music/preview/mixkit-deep-space-ambiance-2549.mp3";
 
 function Estrella({ datos, alHacerClick }: any) {
   const ref = useRef<any>(null);
