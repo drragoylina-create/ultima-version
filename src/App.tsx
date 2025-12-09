@@ -3,12 +3,12 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Stars } from '@react-three/drei';
 import { collection, onSnapshot, addDoc } from "firebase/firestore";
 import { db } from './firebase';
+// ELIMINÉ LA LÍNEA DE LUCIDE-REACT PARA QUE NO TE DE ERROR
 
 // --- TU ENLACE DE PAGO ---
 const STRIPE_LINK = "https://buy.stripe.com/test_cNi14gfvgfa16uJ3Cq0Fi00";
 // -------------------------
 
-// Nota: Agregamos ": any" para que el editor deje de molestar con líneas rojas
 function Estrella({ datos, alHacerClick }: any) {
   const ref = useRef<any>(null);
   const [hovered, setHover] = useState(false);
@@ -56,7 +56,6 @@ export default function App() {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('pagado') === 'si') {
       setMostrandoFormulario(true);
-      alert("¡Pago recibido! Gracias socio. Crea tu estrella eterna ahora.");
       window.history.replaceState({}, document.title, "/");
     }
   }, []);
@@ -83,7 +82,15 @@ export default function App() {
     setMostrandoFormulario(false);
     setNuevoNombre('');
     setNuevoMensaje('');
-    alert("¡Estrella lanzada! 🚀");
+    alert("¡Estrella lanzada! Busca la tuya y compártela.");
+  };
+
+  // 5. FUNCION COMPARTIR WHATSAPP
+  const compartirEnWhatsapp = () => {
+    if (!estrellaSeleccionada) return;
+    const texto = `¡Acabo de encontrar la estrella "${estrellaSeleccionada.nombre}" en la Galaxia Eterna! ✨ Dice: "${estrellaSeleccionada.mensaje}". Entra y consigue la tuya aquí: https://ultima-version.vercel.app/`;
+    const urlWhatsapp = `https://wa.me/?text=${encodeURIComponent(texto)}`;
+    window.open(urlWhatsapp, '_blank');
   };
 
   return (
@@ -98,11 +105,13 @@ export default function App() {
         <OrbitControls autoRotate autoRotateSpeed={0.5} />
       </Canvas>
       
+      {/* HEADER */}
       <div style={{ position: 'absolute', top: 20, left: 20, pointerEvents: 'none' }}>
-        <h1 style={{ color: 'white', margin: 0 }}>GALAXIA ETERNA</h1>
+        <h1 style={{ color: 'white', margin: 0, textShadow: '0 0 10px white' }}>GALAXIA ETERNA</h1>
         <p style={{ color: '#888' }}>{estrellas.length} Habitantes</p>
       </div>
 
+      {/* BOTON DE COMPRA */}
       {!mostrandoFormulario && (
         <button 
           onClick={irAPagar}
@@ -110,36 +119,56 @@ export default function App() {
             position: 'absolute', top: 20, right: 20, 
             padding: '12px 25px', background: 'linear-gradient(45deg, #FFD700, #FFA500)', 
             border: 'none', borderRadius: '25px', cursor: 'pointer', 
-            fontWeight: 'bold', fontSize: '1rem', boxShadow: '0 0 15px rgba(255, 215, 0, 0.5)'
+            fontWeight: 'bold', fontSize: '1rem', boxShadow: '0 0 15px rgba(255, 215, 0, 0.5)',
+            zIndex: 10
           }}>
           ★ Comprar Estrella ($1)
         </button>
       )}
 
+      {/* FORMULARIO POST-PAGO */}
       {mostrandoFormulario && (
         <div style={{
           position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
-          background: 'rgba(255, 255, 255, 0.95)', padding: '30px', borderRadius: '15px', minWidth: '300px', zIndex: 10,
+          background: 'rgba(255, 255, 255, 0.95)', padding: '30px', borderRadius: '15px', minWidth: '300px', zIndex: 20,
           boxShadow: '0 0 50px rgba(255, 215, 0, 0.3)'
         }}>
-          <h2 style={{color: '#333'}}>¡Bienvenido Socio!</h2>
-          <p style={{color: '#666', fontSize: '0.9rem'}}>Tu espacio está reservado.</p>
-          <form onSubmit={guardarEstrella} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <input placeholder="Tu Nombre" value={nuevoNombre} onChange={e => setNuevoNombre(e.target.value)} required style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }} />
-            <textarea placeholder="Tu Mensaje Eterno" value={nuevoMensaje} onChange={e => setNuevoMensaje(e.target.value)} required style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }} />
-            <button type="submit" style={{ padding: '12px', background: 'black', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}>LANZAR AHORA 🚀</button>
+          <h2 style={{color: '#333', textAlign: 'center'}}>¡Bienvenido Socio!</h2>
+          <p style={{color: '#666', fontSize: '0.9rem', textAlign: 'center'}}>Tu espacio está reservado.</p>
+          <form onSubmit={guardarEstrella} style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginTop: '20px' }}>
+            <input placeholder="Tu Nombre" value={nuevoNombre} onChange={e => setNuevoNombre(e.target.value)} required style={{ padding: '12px', borderRadius: '8px', border: '1px solid #ccc', fontSize: '1rem' }} />
+            <textarea placeholder="Tu Mensaje Eterno" value={nuevoMensaje} onChange={e => setNuevoMensaje(e.target.value)} required style={{ padding: '12px', borderRadius: '8px', border: '1px solid #ccc', minHeight: '80px', fontSize: '1rem' }} />
+            <button type="submit" style={{ padding: '15px', background: 'black', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '1rem' }}>LANZAR AHORA 🚀</button>
           </form>
         </div>
       )}
 
+      {/* POPUP AL SELECCIONAR ESTRELLA */}
       {estrellaSeleccionada && (
         <div style={{
-          position: 'absolute', bottom: 20, left: '50%', transform: 'translateX(-50%)',
-          background: 'rgba(0,0,0,0.8)', padding: '20px', borderRadius: '15px', color: 'white', textAlign: 'center', minWidth: '300px', border: '1px solid #333'
+          position: 'absolute', bottom: 30, left: '50%', transform: 'translateX(-50%)',
+          background: 'rgba(10, 10, 10, 0.9)', padding: '25px', borderRadius: '20px', color: 'white', textAlign: 'center', 
+          minWidth: '320px', border: '1px solid #333', backdropFilter: 'blur(10px)',
+          boxShadow: '0 0 30px rgba(0,0,0,0.8)', zIndex: 10
         }}>
-          <h2 style={{ color: estrellaSeleccionada.color, margin: 0 }}>★ {estrellaSeleccionada.nombre}</h2>
-          <p>"{estrellaSeleccionada.mensaje}"</p>
-          <button onClick={() => setEstrellaSeleccionada(null)} style={{ marginTop: '10px', cursor: 'pointer', padding: '5px 10px', borderRadius: '5px', border: 'none' }}>Cerrar</button>
+          <h2 style={{ color: estrellaSeleccionada.color, margin: '0 0 10px 0', fontSize: '1.5rem' }}>★ {estrellaSeleccionada.nombre}</h2>
+          <p style={{ fontStyle: 'italic', color: '#ccc', marginBottom: '20px' }}>"{estrellaSeleccionada.mensaje}"</p>
+          
+          <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+            <button 
+              onClick={compartirEnWhatsapp}
+              style={{ 
+                display: 'flex', alignItems: 'center', gap: '8px',
+                padding: '10px 20px', background: '#25D366', color: 'white', 
+                border: 'none', borderRadius: '50px', cursor: 'pointer', fontWeight: 'bold' 
+              }}>
+              💬 Compartir
+            </button>
+            
+            <button onClick={() => setEstrellaSeleccionada(null)} style={{ padding: '10px 20px', background: '#333', color: 'white', border: 'none', borderRadius: '50px', cursor: 'pointer' }}>
+              Cerrar
+            </button>
+          </div>
         </div>
       )}
     </div>
