@@ -3,12 +3,38 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Stars } from '@react-three/drei';
 import { collection, onSnapshot, addDoc } from "firebase/firestore";
 import { db } from './firebase';
-import { Volume2, VolumeX } from 'lucide-react'; // Iconos de sonido
+import { Volume2, VolumeX, X } from 'lucide-react'; 
 
-// --- CONFIGURACIÓN ---
-const STRIPE_LINK = "https://buy.stripe.com/test_cNi14gfvgfa16uJ3Cq0Fi00";
-// Música ambiental espacial (Royalty Free)
+// --- 🎵 MÚSICA & CONFIGURACIÓN ---
 const MUSIC_URL = "https://archive.org/download/ambientforfilm/Infinity.mp3";
+
+// --- 💰 CATÁLOGO DE ESTRELLAS (Aquí pegas tus links de Stripe) ---
+const CATALOGO = [
+  {
+    id: 'basica',
+    nombre: 'Estrella Naciente',
+    precio: '$1 USD',
+    color: '#FFD700', // Oro
+    desc: 'Tu nombre en el cosmos. Simple y eterno.',
+    link: 'https://buy.stripe.com/test_cNi14gfvgfa16uJ3Cq0Fi00' // <--- TU LINK DE $1
+  },
+  {
+    id: 'media',
+    nombre: 'Gigante Roja',
+    precio: '$5 USD',
+    color: '#FF4500', // Rojo Fuego
+    desc: 'Brilla más fuerte. Destaca entre la multitud.',
+    link: 'LINK_STRIPE_5_DOLARES_AQUI' // <--- PEGA AQUÍ EL LINK DE $5
+  },
+  {
+    id: 'premium',
+    nombre: 'Supernova',
+    precio: '$20 USD',
+    color: '#00FFFF', // Cyan Neón
+    desc: 'La máxima expresión de poder. Una explosión de luz.',
+    link: 'LINK_STRIPE_20_DOLARES_AQUI' // <--- PEGA AQUÍ EL LINK DE $20
+  }
+];
 
 function Estrella({ datos, alHacerClick }: any) {
   const ref = useRef<any>(null);
@@ -16,6 +42,9 @@ function Estrella({ datos, alHacerClick }: any) {
   
   const posicionSegura = datos.posicion ? datos.posicion : [0, 0, 0];
   const posicionReal = [parseFloat(posicionSegura[0]), parseFloat(posicionSegura[1]), parseFloat(posicionSegura[2])];
+
+  // Las estrellas caras se verán un poco más grandes (simulación visual)
+  const escalaBase = datos.tipo === 'premium' ? 1.5 : (datos.tipo === 'media' ? 1.2 : 1);
 
   useFrame((state, delta) => {
     if (ref.current) {
@@ -27,14 +56,14 @@ function Estrella({ datos, alHacerClick }: any) {
     <mesh
       position={posicionReal as [number, number, number]}
       ref={ref}
-      scale={hovered ? 1.8 : 1} // Un poco más grande al pasar el mouse
+      scale={hovered ? (escalaBase * 1.5) : escalaBase} 
       onClick={(e) => { e.stopPropagation(); alHacerClick(datos); }}
       onPointerOver={() => setHover(true)}
       onPointerOut={() => setHover(false)}>
       <sphereGeometry args={[0.5, 32, 32]} />
       <meshStandardMaterial 
-        color={datos.color || 'white'} 
-        emissive={datos.color || 'white'} 
+        color={datos.color || '#FFD700'} 
+        emissive={datos.color || '#FFD700'} 
         emissiveIntensity={hovered ? 3 : 0.8} 
         roughness={0.1}
         metalness={0.1}
@@ -47,37 +76,30 @@ export default function App() {
   const [estrellas, setEstrellas] = useState<any[]>([]);
   const [estrellaSeleccionada, setEstrellaSeleccionada] = useState<any>(null);
   const [mostrandoFormulario, setMostrandoFormulario] = useState(false);
+  const [mostrandoMenu, setMostrandoMenu] = useState(false); // Nuevo estado para el menú
   const [nuevoNombre, setNuevoNombre] = useState('');
   const [nuevoMensaje, setNuevoMensaje] = useState('');
-  
-  // Estado de la música
   const [musicPlaying, setMusicPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(new Audio(MUSIC_URL));
 
-  // 1. CARGAR ESTRELLAS
   useEffect(() => {
     const cancelar = onSnapshot(collection(db, "estrellas"), (snapshot) => {
       setEstrellas(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     });
-    
-    // Configurar música en bucle
     audioRef.current.loop = true;
-    audioRef.current.volume = 0.4; // Volumen suave
-
+    audioRef.current.volume = 0.4;
     return () => cancelar();
   }, []);
 
-  // 2. CONTROL DE MÚSICA
   const toggleMusic = () => {
     if (musicPlaying) {
       audioRef.current.pause();
     } else {
-      audioRef.current.play().catch(e => console.log("Interacción necesaria primero"));
+      audioRef.current.play().catch(e => console.log("Interacción necesaria"));
     }
     setMusicPlaying(!musicPlaying);
   };
 
-  // 3. DETECTOR DE PAGOS
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('pagado') === 'si') {
@@ -86,18 +108,20 @@ export default function App() {
     }
   }, []);
 
-  // 4. GUARDAR ESTRELLA
   const guardarEstrella = async (e: any) => {
     e.preventDefault();
-    const x = (Math.random() - 0.5) * 25; // Universo un poco más grande
-    const y = (Math.random() - 0.5) * 25;
-    const z = (Math.random() - 0.5) * 25;
+    const x = (Math.random() - 0.5) * 30;
+    const y = (Math.random() - 0.5) * 30;
+    const z = (Math.random() - 0.5) * 30;
 
+    // Por ahora guardamos todas como doradas, luego podemos detectar qué compraron
+    // conectando con Stripe avanzado, pero para empezar así funciona:
     await addDoc(collection(db, "estrellas"), {
       nombre: nuevoNombre,
       mensaje: nuevoMensaje,
       color: '#FFD700', 
-      posicion: [x, y, z]
+      posicion: [x, y, z],
+      fecha: new Date().toISOString()
     });
 
     setMostrandoFormulario(false);
@@ -123,67 +147,86 @@ export default function App() {
         {estrellas.map((estrella) => (
           <Estrella key={estrella.id} datos={estrella} alHacerClick={setEstrellaSeleccionada} />
         ))}
-        <OrbitControls autoRotate autoRotateSpeed={0.3} enableZoom={true} minDistance={5} maxDistance={30} />
+        <OrbitControls autoRotate autoRotateSpeed={0.2} enableZoom={true} minDistance={5} maxDistance={40} />
       </Canvas>
       
-      {/* --- UI LAYER --- */}
-
-      {/* 1. HEADER (Marca) */}
-      <div style={{ 
-        position: 'absolute', top: 30, width: '100%', textAlign: 'center', pointerEvents: 'none',
-        textShadow: '0 0 20px rgba(255,255,255,0.3)'
-      }}>
-        <h1 style={{ 
-          color: 'white', margin: 0, fontSize: '3rem', letterSpacing: '8px', fontWeight: '300', fontFamily: 'serif' 
-        }}>ETERNAL</h1>
-        <p style={{ color: '#888', marginTop: '5px', fontSize: '0.8rem', letterSpacing: '3px', textTransform: 'uppercase' }}>
-          {estrellas.length} Almas en el Universo
-        </p>
+      {/* HEADER */}
+      <div style={{ position: 'absolute', top: 30, width: '100%', textAlign: 'center', pointerEvents: 'none', textShadow: '0 0 20px rgba(255,255,255,0.3)' }}>
+        <h1 style={{ color: 'white', margin: 0, fontSize: '3rem', letterSpacing: '8px', fontWeight: '300', fontFamily: 'serif' }}>ETERNAL</h1>
+        <p style={{ color: '#888', marginTop: '5px', fontSize: '0.8rem', letterSpacing: '3px', textTransform: 'uppercase' }}>{estrellas.length} Almas en el Universo</p>
       </div>
 
-      {/* 2. BOTÓN DE MÚSICA (Arriba Derecha) */}
-      <button 
-        onClick={toggleMusic}
-        style={{
-          position: 'absolute', top: 30, right: 30,
-          background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)',
-          color: 'white', padding: '10px', borderRadius: '50%', cursor: 'pointer',
-          backdropFilter: 'blur(5px)', transition: 'all 0.3s ease'
-        }}>
+      <button onClick={toggleMusic} style={{ position: 'absolute', top: 30, right: 30, background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: 'white', padding: '10px', borderRadius: '50%', cursor: 'pointer', backdropFilter: 'blur(5px)' }}>
         {musicPlaying ? <Volume2 size={20} /> : <VolumeX size={20} />}
       </button>
 
-      {/* 3. BOTÓN DE COMPRA (Centro Abajo) */}
-      {/* Solo se muestra si no hay formulario y NO hay estrella seleccionada */}
-      {!mostrandoFormulario && !estrellaSeleccionada && (
+      {/* BOTÓN PRINCIPAL (Abre el Menú) */}
+      {!mostrandoFormulario && !mostrandoMenu && !estrellaSeleccionada && (
         <button 
-          onClick={() => window.location.href = STRIPE_LINK}
+          onClick={() => setMostrandoMenu(true)}
           style={{ 
             position: 'absolute', bottom: 50, left: '50%', transform: 'translateX(-50%)',
-            padding: '15px 40px', 
-            background: 'linear-gradient(90deg, #FFD700, #FDB931)', 
-            color: 'black',
-            border: 'none', borderRadius: '50px', cursor: 'pointer', 
+            padding: '15px 40px', background: 'linear-gradient(90deg, #FFD700, #FDB931)', 
+            color: 'black', border: 'none', borderRadius: '50px', cursor: 'pointer', 
             fontWeight: 'bold', fontSize: '1.1rem', letterSpacing: '1px',
-            boxShadow: '0 0 30px rgba(255, 215, 0, 0.4)',
-            transition: 'transform 0.2s',
-            zIndex: 10
-          }}
-          onMouseOver={(e) => e.currentTarget.style.transform = 'translateX(-50%) scale(1.05)'}
-          onMouseOut={(e) => e.currentTarget.style.transform = 'translateX(-50%) scale(1)'}
-          >
-          ★ INMORTALIZAR MI NOMBRE ($1)
+            boxShadow: '0 0 30px rgba(255, 215, 0, 0.4)', zIndex: 10
+          }}>
+          ★ INMORTALIZAR MI NOMBRE
         </button>
       )}
 
-      {/* 4. FORMULARIO POST-PAGO */}
+      {/* MENÚ DE SELECCIÓN (CATÁLOGO) */}
+      {mostrandoMenu && (
+        <div style={{
+          position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+          background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(10px)', zIndex: 20,
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'
+        }}>
+          <button onClick={() => setMostrandoMenu(false)} style={{ position: 'absolute', top: 30, right: 30, background: 'none', border: 'none', color: 'white', cursor: 'pointer' }}>
+            <X size={40} />
+          </button>
+          
+          <h2 style={{ color: 'white', fontFamily: 'serif', fontSize: '2rem', marginBottom: '40px' }}>Selecciona tu Legado</h2>
+          
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '30px', justifyContent: 'center', padding: '20px' }}>
+            {CATALOGO.map((item) => (
+              <div key={item.id} style={{
+                background: 'rgba(255,255,255,0.05)', border: `1px solid ${item.color}`,
+                borderRadius: '20px', padding: '30px', width: '280px', textAlign: 'center',
+                transition: 'transform 0.3s', cursor: 'pointer'
+              }}
+              onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+              onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+              >
+                <div style={{ 
+                  width: '60px', height: '60px', background: item.color, borderRadius: '50%', 
+                  margin: '0 auto 20px auto', boxShadow: `0 0 30px ${item.color}` 
+                }}></div>
+                <h3 style={{ color: 'white', margin: '10px 0' }}>{item.nombre}</h3>
+                <p style={{ color: item.color, fontSize: '1.5rem', fontWeight: 'bold', margin: '10px 0' }}>{item.precio}</p>
+                <p style={{ color: '#aaa', fontSize: '0.9rem', marginBottom: '20px', minHeight: '40px' }}>{item.desc}</p>
+                <button 
+                  onClick={() => window.location.href = item.link}
+                  style={{
+                    background: 'white', color: 'black', border: 'none', padding: '10px 25px',
+                    borderRadius: '25px', fontWeight: 'bold', cursor: 'pointer', width: '100%'
+                  }}>
+                  Elegir
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* FORMULARIO POST-PAGO */}
       {mostrandoFormulario && (
         <div style={{
           position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
-          background: 'rgba(10, 10, 10, 0.95)', padding: '40px', borderRadius: '20px', width: '90%', maxWidth: '400px', zIndex: 20,
+          background: 'rgba(10, 10, 10, 0.95)', padding: '40px', borderRadius: '20px', width: '90%', maxWidth: '400px', zIndex: 30,
           boxShadow: '0 0 50px rgba(255, 215, 0, 0.2)', border: '1px solid rgba(255, 255, 255, 0.1)'
         }}>
-          <h2 style={{color: 'white', textAlign: 'center', marginBottom: '10px', fontFamily: 'serif'}}>Bienvenido a Eternal</h2>
+          <h2 style={{color: 'white', textAlign: 'center', marginBottom: '10px', fontFamily: 'serif'}}>Bienvenido Socio</h2>
           <p style={{color: '#888', fontSize: '0.9rem', textAlign: 'center', marginBottom: '30px'}}>Tu lugar en el cosmos está listo.</p>
           <form onSubmit={guardarEstrella} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
             <input placeholder="Tu Nombre" value={nuevoNombre} onChange={e => setNuevoNombre(e.target.value)} required 
@@ -195,28 +238,19 @@ export default function App() {
         </div>
       )}
 
-      {/* 5. POPUP ESTRELLA SELECCIONADA */}
       {estrellaSeleccionada && (
         <div style={{
           position: 'absolute', bottom: 50, left: '50%', transform: 'translateX(-50%)',
           background: 'rgba(0, 0, 0, 0.8)', padding: '30px', borderRadius: '20px', color: 'white', textAlign: 'center', 
           width: '90%', maxWidth: '350px', border: '1px solid rgba(255, 255, 255, 0.1)', backdropFilter: 'blur(20px)',
-          zIndex: 10, animation: 'fadeIn 0.3s ease'
+          zIndex: 10
         }}>
           <h2 style={{ color: estrellaSeleccionada.color, margin: '0 0 15px 0', fontSize: '1.8rem', fontFamily: 'serif' }}>{estrellaSeleccionada.nombre}</h2>
           <div style={{width: '50px', height: '1px', background: 'white', margin: '0 auto 15px auto', opacity: 0.3}}></div>
           <p style={{ fontStyle: 'italic', color: '#ccc', marginBottom: '25px', lineHeight: '1.5' }}>"{estrellaSeleccionada.mensaje}"</p>
-          
           <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-            <button onClick={compartirEnWhatsapp} style={{ 
-                flex: 1, padding: '12px', background: '#25D366', color: 'white', 
-                border: 'none', borderRadius: '10px', cursor: 'pointer', fontWeight: 'bold' 
-              }}>
-              Whatsapp
-            </button>
-            <button onClick={() => setEstrellaSeleccionada(null)} style={{ flex: 1, padding: '12px', background: 'transparent', color: 'white', border: '1px solid #333', borderRadius: '10px', cursor: 'pointer' }}>
-              Cerrar
-            </button>
+            <button onClick={compartirEnWhatsapp} style={{ flex: 1, padding: '12px', background: '#25D366', color: 'white', border: 'none', borderRadius: '10px', cursor: 'pointer', fontWeight: 'bold' }}>Whatsapp</button>
+            <button onClick={() => setEstrellaSeleccionada(null)} style={{ flex: 1, padding: '12px', background: 'transparent', color: 'white', border: '1px solid #333', borderRadius: '10px', cursor: 'pointer' }}>Cerrar</button>
           </div>
         </div>
       )}
