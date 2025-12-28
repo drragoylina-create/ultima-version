@@ -11,11 +11,8 @@ const MUSIC_URL = "https://archive.org/download/ambientforfilm/Infinity.mp3";
 
 // --- 💎 DEMO STARS ---
 const DEMO_STARS = [
-  // $100: Oro (Patrullando con Estela)
   { id: 'd100', nombre: 'IMPERIO GOLD', mensaje: 'Liderando el mercado global.', color: '#FFD700', posicion: [0, 10, -60], imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/1200px-Apple_logo_black.svg.png', link: 'https://apple.com', precio: '100' },
-  // $50: Amatista
   { id: 'd50', nombre: 'TECH CORP', mensaje: 'Innovación futura.', color: '#9932CC', posicion: [-50, -10, 20], imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/1200px-Google_2015_logo.svg.png', link: 'https://google.com', precio: '50' },
-  // $20: Zafiro
   { id: 'd20', nombre: 'Crypto Fund', mensaje: 'Inversiones descentralizadas.', color: '#00BFFF', posicion: [50, 20, 40], imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Bitcoin.svg/1200px-Bitcoin.svg.png', link: 'https://bitcoin.org', precio: '20' }
 ];
 
@@ -29,7 +26,7 @@ const CATALOGO = [
   { id: 'fugaz', nombre: '⭐ Patrocinador ($50/Día)', precio: '$50/Día', color: '#00FF00', features: ['COMETA RÁPIDO', 'Estela Gigante', 'Imposible de ignorar'], desc: 'Atención total por 24h.', link: 'LINK_DIARIO' }
 ];
 
-// --- ESTRELLA FUGAZ (VERDE NEÓN) ---
+// --- ESTRELLA FUGAZ ---
 function EstrellaFugaz({ color = '#00FF00', mensaje = '📢 PATROCINADOR: TU MARCA AQUÍ' }) {
     const ref = useRef<any>();
     const speed = 15; const range = 200; 
@@ -52,7 +49,7 @@ function EstrellaFugaz({ color = '#00FF00', mensaje = '📢 PATROCINADOR: TU MAR
     );
 }
 
-// --- ESTRELLA PRINCIPAL (CON ESTELA DORADA Y CHISPAS PARA LA DE $100) ---
+// --- ESTRELLA PRINCIPAL ---
 function Estrella({ datos, alHacerClick }: any) {
   const groupRef = useRef<any>(null);
   const meshRef = useRef<any>(null);
@@ -72,18 +69,16 @@ function Estrella({ datos, alHacerClick }: any) {
   if (datos.color === '#DC143C') escalaBase = 1.2; 
   if (datos.color === '#00BFFF') escalaBase = 1.8; 
   if (esAmatista) escalaBase = 2.5; 
-  if (esOro) escalaBase = 4.0; // Oro grande
+  if (esOro) escalaBase = 4.0; 
 
   useFrame((state, delta) => {
     const t = state.clock.elapsedTime;
     if (groupRef.current) {
         if (esOro) { 
-            // Movimiento Patrulla para Oro
-            const pathRange = 250; const pathSpeed = 2; // Un poco más rápido para que se note la estela
+            const pathRange = 250; const pathSpeed = 2; 
             const newX = ((t * pathSpeed + movementData.pathOffset) % (pathRange * 2)) - pathRange;
             groupRef.current.position.set(newX, initialPos.y + Math.sin(t * 0.3) * 5, initialPos.z);
         } else { 
-            // Órbita para el resto
             groupRef.current.position.x = initialPos.x + Math.cos(t * movementData.speed + movementData.offset) * movementData.radius;
             groupRef.current.position.z = initialPos.z + Math.sin(t * movementData.speed + movementData.offset) * movementData.radius;
             groupRef.current.position.y = initialPos.y + Math.sin(t * 0.2 + movementData.offset) * 3;
@@ -92,59 +87,29 @@ function Estrella({ datos, alHacerClick }: any) {
     if (meshRef.current) {
        meshRef.current.rotation.y += delta * 0.2;
        let scaleMultiplier = 1;
-       if (esOro) scaleMultiplier = Math.sin(t * 3) * 0.1 + 1; // Parpadeo
+       if (esOro) scaleMultiplier = Math.sin(t * 3) * 0.1 + 1; 
        const scaleTarget = (hovered ? escalaBase * 1.15 : escalaBase) * scaleMultiplier;
        meshRef.current.scale.lerp(new THREE.Vector3(scaleTarget, scaleTarget, scaleTarget), 0.1);
     }
   });
 
   const intensidad = esOro ? 6 : (esAmatista ? 3.5 : 2);
-
   const materialSolido = (
-    <meshPhysicalMaterial 
-        color={datos.color} emissive={datos.color} emissiveIntensity={hovered ? intensidad * 1.5 : intensidad}
-        transparent={false} opacity={1} transmission={0} roughness={0.15} metalness={0.9} clearcoat={1} clearcoatRoughness={0}
-    />
+    <meshPhysicalMaterial color={datos.color} emissive={datos.color} emissiveIntensity={hovered ? intensidad * 1.5 : intensidad} transparent={false} opacity={1} transmission={0} roughness={0.15} metalness={0.9} clearcoat={1} clearcoatRoughness={0} />
   );
 
-  // CONTENIDO DE LA ESTRELLA (Para reusar dentro o fuera del Trail)
   const ContenidoEstrella = () => (
     <>
-        <mesh
-            ref={meshRef}
-            onClick={(e) => { e.stopPropagation(); alHacerClick(datos); }}
-            onPointerOver={() => { document.body.style.cursor = 'pointer'; setHover(true); }}
-            onPointerOut={() => { document.body.style.cursor = 'default'; setHover(false); }}>
+        <mesh ref={meshRef} onClick={(e) => { e.stopPropagation(); alHacerClick(datos); }} onPointerOver={() => { document.body.style.cursor = 'pointer'; setHover(true); }} onPointerOut={() => { document.body.style.cursor = 'default'; setHover(false); }}>
             <sphereGeometry args={[1, 64, 64]} />
             {materialSolido}
         </mesh>
-
-        {/* CHISPAS DORADAS SOLO PARA LA DE $100 */}
-        {esOro && (
-            <Sparkles count={15} scale={escalaBase * 2.5} size={4} speed={0.4} opacity={1} color="#FFD700" />
-        )}
-        
-        {/* Nombre al hacer Hover */}
-        {hovered && (
-            <Text position={[0, escalaBase + 1.2, 0]} fontSize={escalaBase > 3 ? 1.2 : 0.8} color="white" anchorX="center" anchorY="middle" outlineWidth={0.05} outlineColor={datos.color}>
-                {datos.nombre}
-            </Text>
-        )}
+        {esOro && ( <Sparkles count={15} scale={escalaBase * 2.5} size={4} speed={0.4} opacity={1} color="#FFD700" /> )}
+        {hovered && ( <Text position={[0, escalaBase + 1.2, 0]} fontSize={escalaBase > 3 ? 1.2 : 0.8} color="white" anchorX="center" anchorY="middle" outlineWidth={0.05} outlineColor={datos.color}>{datos.nombre}</Text> )}
     </>
   );
 
-  return (
-    <group ref={groupRef} position={initialPos.toArray() as [number, number, number]}>
-      {/* Si es ORO ($100), le ponemos Trail. Si no, renderizamos normal */}
-      {esOro ? (
-          <Trail width={3} length={12} color="#FFD700" attenuation={(t) => t * t}>
-              <ContenidoEstrella />
-          </Trail>
-      ) : (
-          <ContenidoEstrella />
-      )}
-    </group>
-  );
+  return ( <group ref={groupRef} position={initialPos.toArray() as [number, number, number]}>{esOro ? ( <Trail width={3} length={12} color="#FFD700" attenuation={(t) => t * t}><ContenidoEstrella /></Trail> ) : ( <ContenidoEstrella /> )}</group> );
 }
 
 export default function App() {
@@ -195,12 +160,10 @@ export default function App() {
     alert("¡Marca registrada! 🚀");
   };
 
-  // --- FUNCIÓN DE WHATSAPP MEJORADA ---
   const compartirEstrella = () => {
       if (!estrellaSeleccionada) return;
       const mensaje = `¡He encontrado tu estrella "${estrellaSeleccionada.nombre}" en Eternal Galaxy! ✨ Mira aquí:`;
       const url = window.location.href;
-      // Usamos wa.me directo para abrir WhatsApp App o Web
       const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(mensaje + ' ' + url)}`;
       window.open(whatsappUrl, '_blank');
   };
@@ -228,17 +191,28 @@ export default function App() {
         <OrbitControls autoRotate autoRotateSpeed={0.1} enableZoom={true} minDistance={10} maxDistance={250} enablePan={false} />
       </Canvas>
       
-      <div style={{ position: 'absolute', top: '5%', width: '100%', textAlign: 'center', pointerEvents: 'none', textShadow: '0 0 50px rgba(255, 215, 0, 0.5)', padding: '0 20px', zIndex: 10 }}>
-        <h1 style={{ color: 'white', margin: 0, fontSize: 'clamp(3rem, 8vw, 6rem)', letterSpacing: '10px', fontWeight: '100', fontFamily: 'serif' }}>ETERNAL</h1>
-        <p style={{ color: '#FDB931', marginTop: '10px', fontSize: '1rem', letterSpacing: '6px', textTransform: 'uppercase', fontWeight: 'bold' }}>Directorio de Prestigio Galáctico</p>
+      {/* HEADER INTEGRADO Y LIMPIO */}
+      <div style={{ position: 'absolute', top: '5%', width: '100%', textAlign: 'center', pointerEvents: 'none', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        {/* Título */}
+        <h1 style={{ color: 'white', margin: 0, fontSize: 'clamp(2rem, 5vw, 4rem)', letterSpacing: '8px', fontWeight: '100', fontFamily: 'serif', textShadow: '0 0 50px rgba(255, 215, 0, 0.5)' }}>
+          ETERNAL
+        </h1>
+        {/* Subtítulo */}
+        <p style={{ color: '#FDB931', margin: '5px 0 15px 0', fontSize: '0.8rem', letterSpacing: '4px', textTransform: 'uppercase', fontWeight: 'bold' }}>
+          REGISTRO UNIVERSAL PERMANENTE
+        </p>
+        {/* Contador Hackerman (Sin cajas, solo texto verde) */}
+        <div style={{ color: '#00FF00', fontSize: '0.75rem', fontFamily: 'monospace', textShadow: '0 0 5px #00FF00', letterSpacing: '1px' }}>
+          ● {estrellas.length} SEÑALES EN ÓRBITA
+        </div>
       </div>
 
-      <button onClick={toggleMusic} style={{ position: 'absolute', top: 30, left: 30, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.2)', color: 'white', padding: '12px', borderRadius: '50%', cursor: 'pointer', backdropFilter: 'blur(5px)', zIndex: 50 }}>
-        {musicPlaying ? <Volume2 size={20} /> : <VolumeX size={20} />}
+      <button onClick={toggleMusic} style={{ position: 'absolute', top: 30, left: 30, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.2)', color: 'white', padding: '10px', borderRadius: '50%', cursor: 'pointer', backdropFilter: 'blur(5px)', zIndex: 50 }}>
+        {musicPlaying ? <Volume2 size={18} /> : <VolumeX size={18} />}
       </button>
 
       {!mostrandoFormulario && !mostrandoMenu && !estrellaSeleccionada && (
-        <button onClick={() => setMostrandoMenu(true)} style={{ position: 'absolute', bottom: '15vh', left: '50%', transform: 'translateX(-50%)', padding: '20px 70px', background: 'linear-gradient(45deg, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C)', color: '#1a0b2e', border: '2px solid rgba(255, 255, 255, 0.5)', borderRadius: '50px', cursor: 'pointer', fontWeight: '900', fontSize: '1.3rem', letterSpacing: '3px', boxShadow: '0 0 70px rgba(255, 215, 0, 0.6), inset 0 0 20px rgba(255,255,255,0.5)', zIndex: 10, whiteSpace: 'nowrap', transition: 'all 0.3s ease', textTransform: 'uppercase' }}>★ Inmortalizar Marca</button>
+        <button onClick={() => setMostrandoMenu(true)} style={{ position: 'absolute', bottom: '15vh', left: '50%', transform: 'translateX(-50%)', padding: '12px 35px', background: 'linear-gradient(45deg, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C)', color: '#1a0b2e', border: '1px solid rgba(255, 255, 255, 0.5)', borderRadius: '50px', cursor: 'pointer', fontWeight: '900', fontSize: '0.9rem', letterSpacing: '2px', boxShadow: '0 0 40px rgba(255, 215, 0, 0.4), inset 0 0 10px rgba(255,255,255,0.5)', zIndex: 10, whiteSpace: 'nowrap', transition: 'all 0.3s ease', textTransform: 'uppercase' }}>★ Inmortalizar Marca</button>
       )}
 
       {mostrandoMenu && (
@@ -250,10 +224,6 @@ export default function App() {
               <div key={item.id} style={{ background: `linear-gradient(145deg, rgba(255,255,255,0.03), ${item.color}08)`, border: `1px solid ${item.color}40`, borderRadius: '20px', padding: '30px', width: '100%', maxWidth: '280px', textAlign: 'center', boxShadow: `0 0 30px ${item.color}10`, display: 'flex', flexDirection: 'column', transform: (item.precio.includes('100') || item.precio.includes('Día')) ? 'scale(1.05)' : 'scale(1)', borderTop: `3px solid ${item.color}`, position: 'relative' }}>
                 <h3 style={{ color: item.color, margin: '0 0 10px 0', fontSize: '1.2rem', letterSpacing: '1px', textTransform: 'uppercase' }}>{item.nombre}</h3>
                 <p style={{ color: 'white', fontSize: (item.precio.includes('Día')) ? '1.8rem' : '2.5rem', fontWeight: '900', margin: '5px 0', textShadow: `0 0 15px ${item.color}` }}>{item.precio}</p>
-                <div style={{ margin: '20px 0', textAlign: 'left', flex: 1, borderTop: '1px solid rgba(255,255,255,0.1)', borderBottom: '1px solid rgba(255,255,255,0.1)', padding: '15px 0' }}>
-                    {item.features.map((feat, i) => ( <p key={i} style={{color: '#ddd', fontSize: '0.9rem', margin: '8px 0', display: 'flex', alignItems: 'center'}}><span style={{color: item.color, marginRight: '10px', fontSize: '1.2rem'}}>✓</span> {feat}</p> ))}
-                </div>
-                <p style={{ color: '#888', fontSize: '0.85rem', fontStyle: 'italic', marginBottom: '20px' }}>{item.desc}</p>
                 <button onClick={() => window.location.href = item.link} style={{ background: item.color, color: item.color === '#FFD700' || item.color === '#00FF00' ? 'black' : 'white', border: 'none', padding: '15px 0', borderRadius: '30px', fontWeight: '900', cursor: 'pointer', width: '100%', fontSize: '1rem', marginTop: 'auto', boxShadow: `0 0 25px ${item.color}40` }}>ELEGIR PLAN</button>
               </div>
             ))}
@@ -276,24 +246,13 @@ export default function App() {
 
       {estrellaSeleccionada && (
         <div style={{ position: 'absolute', bottom: '10%', left: '50%', transform: 'translateX(-50%)', background: 'rgba(10, 10, 15, 0.95)', padding: '35px', borderRadius: '25px', color: 'white', textAlign: 'center', width: '90%', maxWidth: '400px', border: `1px solid ${estrellaSeleccionada.color}`, backdropFilter: 'blur(30px)', zIndex: 10, boxShadow: `0 0 80px ${estrellaSeleccionada.color}40` }}>
-          
           {estrellaSeleccionada.imageUrl && ( <img src={estrellaSeleccionada.imageUrl} alt="Logo" style={{width: '100px', height: '100px', borderRadius: '50%', objectFit: 'contain', background: 'white', padding: '5px', margin: '0 auto 20px auto', border: `3px solid ${estrellaSeleccionada.color}`, boxShadow: `0 0 40px ${estrellaSeleccionada.color}50`}} /> )}
-          
           <h2 style={{ color: estrellaSeleccionada.color, margin: '0 0 15px 0', fontSize: '2rem', fontFamily: 'serif', textShadow: `0 0 30px ${estrellaSeleccionada.color}` }}>{estrellaSeleccionada.nombre}</h2>
           <p style={{ fontStyle: 'italic', color: '#eee', marginBottom: '25px', lineHeight: '1.6', fontSize: '1.1rem' }}>"{estrellaSeleccionada.mensaje}"</p>
-          
           <div style={{display: 'flex', flexDirection: 'column', gap: '10px'}}>
-            {estrellaSeleccionada.link && ( 
-                <button onClick={() => window.open(estrellaSeleccionada.link, '_blank')} style={{ width: '100%', padding: '18px', background: estrellaSeleccionada.color, color: estrellaSeleccionada.color === '#FFD700' ? 'black' : 'white', border: 'none', borderRadius: '15px', cursor: 'pointer', fontWeight: '900', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', boxShadow: `0 0 30px ${estrellaSeleccionada.color}60` }}>
-                    <ExternalLink size={20} /> VISITAR
-                </button> 
-            )}
-            
-            <button onClick={compartirEstrella} style={{ width: '100%', padding: '18px', background: 'rgba(255,255,255,0.15)', color: 'white', border: `1px solid ${estrellaSeleccionada.color}`, borderRadius: '15px', cursor: 'pointer', fontWeight: '900', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-                <Share2 size={20} /> COMPARTIR (WhatsApp)
-            </button>
+            {estrellaSeleccionada.link && ( <button onClick={() => window.open(estrellaSeleccionada.link, '_blank')} style={{ width: '100%', padding: '18px', background: estrellaSeleccionada.color, color: estrellaSeleccionada.color === '#FFD700' ? 'black' : 'white', border: 'none', borderRadius: '15px', cursor: 'pointer', fontWeight: '900', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', boxShadow: `0 0 30px ${estrellaSeleccionada.color}60` }}><ExternalLink size={20} /> VISITAR</button> )}
+            <button onClick={compartirEstrella} style={{ width: '100%', padding: '18px', background: 'rgba(255,255,255,0.15)', color: 'white', border: `1px solid ${estrellaSeleccionada.color}`, borderRadius: '15px', cursor: 'pointer', fontWeight: '900', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}><Share2 size={20} /> COMPARTIR (WhatsApp)</button>
           </div>
-
           <button onClick={() => setEstrellaSeleccionada(null)} style={{ marginTop: '15px', background: 'transparent', border: 'none', color: '#888', cursor: 'pointer', textDecoration: 'underline' }}>Cerrar</button>
         </div>
       )}
