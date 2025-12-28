@@ -12,18 +12,22 @@ const MUSIC_URL = "https://archive.org/download/ambientforfilm/Infinity.mp3";
 // --- 💎 DEMO STARS ---
 const DEMO_STARS = [
   { id: 'd100', nombre: 'IMPERIO GOLD', mensaje: 'Liderando el mercado global.', color: '#FFD700', posicion: [0, 10, -60], imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/1200px-Apple_logo_black.svg.png', link: 'https://apple.com', precio: '100' },
+  // Cambiada la demo de $50 a otro color para que no choque con el nuevo verde esmeralda
   { id: 'd50', nombre: 'TECH CORP', mensaje: 'Innovación futura.', color: '#9932CC', posicion: [-50, -10, 20], imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/1200px-Google_2015_logo.svg.png', link: 'https://google.com', precio: '50' },
-  { id: 'd20', nombre: 'Crypto Fund', mensaje: 'Inversiones descentralizadas.', color: '#00BFFF', posicion: [50, 20, 40], imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Bitcoin.svg/1200px-Bitcoin.svg.png', link: 'https://bitcoin.org', precio: '20' }
+  { id: 'd20', nombre: 'Crypto Fund', mensaje: 'Inversiones descentralizadas.', color: '#00BFFF', posicion: [50, 20, 40], imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Bitcoin.svg/1200px-Bitcoin.svg.png', link: 'https://bitcoin.org', precio: '20' },
+  // Añado una demo Esmeralda para que se vea el nuevo rey
+  { id: 'd5', nombre: 'Growth Hacking', mensaje: 'Creciendo rápido.', color: '#00FF7F', posicion: [30, -20, -30], link: '#', precio: '5' }
 ];
 
-// --- 💰 CATÁLOGO ---
+// --- 💰 CATÁLOGO (COPYWRITING VIRAL Y NUEVO REY ESMERALDA) ---
 const CATALOGO = [
-  { id: 'basica', nombre: 'Acero ($1)', precio: '$1', color: '#B0C4DE', features: ['Esfera Metálica', 'Sin Logo', 'Solo Clic'], desc: 'Huella discreta.', link: 'LINK_STRIPE_1' },
-  { id: 'media', nombre: 'Rubí ($5)', precio: '$5', color: '#DC143C', features: ['Metal Rojo', 'Sin Logo', 'Con Enlace'], desc: 'Tráfico económico.', link: 'LINK_STRIPE_5' },
-  { id: 'premium', nombre: 'Zafiro ($20)', precio: '$20', color: '#00BFFF', features: ['Esfera Sólida', 'LOGO EN POPUP', 'Alta Visibilidad'], desc: 'Tu marca en metal puro.', link: 'LINK_STRIPE_20' },
-  { id: 'corp', nombre: 'Amatista ($50)', precio: '$50', color: '#9932CC', features: ['Esfera XL', 'Logo XL', 'Metal Profundo'], desc: 'Presencia sólida.', link: 'LINK_STRIPE_50' },
-  { id: 'imperio', nombre: 'ORO PURO ($100)', precio: '$100', color: '#FFD700', features: ['ESTELA DORADA', 'Efecto Chispas', 'Oro Macizo'], desc: 'El Jefe. Inigualable.', link: 'LINK_STRIPE_100' },
-  { id: 'fugaz', nombre: '⭐ Patrocinador ($50/Día)', precio: '$50/Día', color: '#00FF00', features: ['COMETA RÁPIDO', 'Estela Gigante', 'Imposible de ignorar'], desc: 'Atención total por 24h.', link: 'LINK_DIARIO' }
+  { id: 'basica', nombre: 'Acero ($1)', precio: '$1', color: '#B0C4DE', features: ['Esfera Metálica', 'Sin Logo', 'Solo Clic'], desc: "Para los que quieren decir 'Yo estuve ahí' sin gastar lo de un café. Tu huella digital low-cost. Básica, pero eterna en la blockchain.", link: 'LINK_STRIPE_1' },
+  // EL NUEVO REY: ESMERALDA
+  { id: 'esmeralda', nombre: 'Esmeralda ($5)', precio: '$5', color: '#00FF7F', features: ['VERDE RADIACTIVO', 'Sin Logo', 'Destaca Más'], desc: "¡EL MVP! Deja de ser un NPC y brilla con fuerza radiactiva. La opción inteligente: máximo impacto visual por el precio de una hamburguesa. ¡Haz que te vean de verdad!", link: 'LINK_STRIPE_5' },
+  { id: 'premium', nombre: 'Zafiro ($20)', precio: '$20', color: '#00BFFF', features: ['Esfera Sólida', 'LOGO EN POPUP', 'Alta Visibilidad'], desc: "Entrando en las ligas mayores. Tu logo ya se asoma y la gente empieza a preguntar '¿Quién es ese?'. Seriedad y estilo azul profundo para marcas que van en serio.", link: 'LINK_STRIPE_20' },
+  { id: 'corp', nombre: 'Amatista ($50)', precio: '$50', color: '#9932CC', features: ['Esfera XL', 'Logo XL', 'Metal Profundo'], desc: "Nivel Ejecutivo. Aquí no se viene a jugar. Una esfera masiva que dice 'Mi empresa pesa en la galaxia'. Impón respeto con un solo clic.", link: 'LINK_STRIPE_50' },
+  { id: 'imperio', nombre: 'ORO PURO ($100)', precio: '$100', color: '#FFD700', features: ['ESTELA DORADA', 'Efecto Chispas', 'Oro Macizo'], desc: "El 'Fuck You Money' espacial. No solo estás, sino que patrullas el universo dejando una estela de oro para que los plebeyos la admiren. El REY absoluto.", link: 'LINK_STRIPE_100' },
+  { id: 'fugaz', nombre: '⭐ Patrocinador ($50/Día)', precio: '$50/Día', color: '#00FF00', features: ['COMETA RÁPIDO', 'Estela Gigante', 'Atención Total'], desc: "¡MÍRAME! ¡MÍRAME! Alquila la atención total por 24h. Cruza la pantalla como un cohete de anabolizantes. Ideal para lanzamientos desesperados y urgentes.", link: 'LINK_DIARIO' }
 ];
 
 // --- ESTRELLA FUGAZ ---
@@ -64,9 +68,12 @@ function Estrella({ datos, alHacerClick }: any) {
   
   const esOro = datos.color === '#FFD700'; 
   const esAmatista = datos.color === '#9932CC';
+  // Nuevo chequeo para Esmeralda
+  const esEsmeralda = datos.color === '#00FF7F';
   
   let escalaBase = 0.8; 
-  if (datos.color === '#DC143C') escalaBase = 1.2; 
+  // Ajustamos escala para que Esmeralda destaque un poco más que la base
+  if (esEsmeralda) escalaBase = 1.3; 
   if (datos.color === '#00BFFF') escalaBase = 1.8; 
   if (esAmatista) escalaBase = 2.5; 
   if (esOro) escalaBase = 4.0; 
@@ -88,12 +95,15 @@ function Estrella({ datos, alHacerClick }: any) {
        meshRef.current.rotation.y += delta * 0.2;
        let scaleMultiplier = 1;
        if (esOro) scaleMultiplier = Math.sin(t * 3) * 0.1 + 1; 
+       // Esmeralda también parpadea un poquito para llamar la atención
+       if (esEsmeralda) scaleMultiplier = Math.sin(t * 2) * 0.05 + 1;
        const scaleTarget = (hovered ? escalaBase * 1.15 : escalaBase) * scaleMultiplier;
        meshRef.current.scale.lerp(new THREE.Vector3(scaleTarget, scaleTarget, scaleTarget), 0.1);
     }
   });
 
-  const intensidad = esOro ? 6 : (esAmatista ? 3.5 : 2);
+  // Intensidad de brillo ajustada para el nuevo verde
+  const intensidad = esOro ? 6 : (esAmatista ? 3.5 : (esEsmeralda ? 3 : 2));
   const materialSolido = (
     <meshPhysicalMaterial color={datos.color} emissive={datos.color} emissiveIntensity={hovered ? intensidad * 1.5 : intensidad} transparent={false} opacity={1} transmission={0} roughness={0.15} metalness={0.9} clearcoat={1} clearcoatRoughness={0} />
   );
@@ -152,9 +162,12 @@ export default function App() {
     const y = r * Math.sin(phi) * Math.sin(theta);
     const z = r * Math.cos(phi);
     let linkFinal = nuevoLink; if (linkFinal && !linkFinal.startsWith('http') && linkFinal.length > 0) linkFinal = 'https://' + linkFinal;
-    let colorFinal = '#B0C4DE'; // $1
-    if (linkFinal) colorFinal = '#DC143C'; // $5
-    if (nuevaImagen) colorFinal = '#00BFFF'; // $20
+    
+    // LÓGICA DE PRECIOS ACTUALIZADA (Esmeralda es el nuevo $5)
+    let colorFinal = '#B0C4DE'; // $1 Acero
+    if (linkFinal && !nuevaImagen) colorFinal = '#00FF7F'; // $5 Esmeralda (Si tiene link pero no logo)
+    if (nuevaImagen) colorFinal = '#00BFFF'; // $20 Zafiro (Si tiene logo)
+    
     await addDoc(collection(db, "estrellas"), { nombre: nuevoNombre, mensaje: nuevoMensaje, link: linkFinal, imageUrl: nuevaImagen, color: colorFinal, posicion: [x, y, z], fecha: new Date().toISOString() });
     setMostrandoFormulario(false); setNuevoNombre(''); setNuevoMensaje(''); setNuevoLink(''); setNuevaImagen('');
     alert("¡Marca registrada! 🚀");
@@ -177,6 +190,8 @@ export default function App() {
         <spotLight position={[50, 50, 50]} angle={0.3} penumbra={1} intensity={5} castShadow color="#ffffff" />
         <pointLight position={[-40, -20, -20]} intensity={3} color="#ffd700"/>
         <pointLight position={[0, 50, 0]} intensity={2} color="#00BFFF"/> 
+        {/* Luz extra para resaltar el nuevo verde esmeralda */}
+        <pointLight position={[20, -30, 20]} intensity={2} color="#00FF7F"/>
 
         <EstrellaFugaz color="#00FF00" mensaje="📢 ESPACIO DISPONIBLE HOY: $50" />
 
@@ -191,20 +206,10 @@ export default function App() {
         <OrbitControls autoRotate autoRotateSpeed={0.1} enableZoom={true} minDistance={10} maxDistance={250} enablePan={false} />
       </Canvas>
       
-      {/* HEADER INTEGRADO Y LIMPIO */}
       <div style={{ position: 'absolute', top: '5%', width: '100%', textAlign: 'center', pointerEvents: 'none', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        {/* Título */}
-        <h1 style={{ color: 'white', margin: 0, fontSize: 'clamp(2rem, 5vw, 4rem)', letterSpacing: '8px', fontWeight: '100', fontFamily: 'serif', textShadow: '0 0 50px rgba(255, 215, 0, 0.5)' }}>
-          ETERNAL
-        </h1>
-        {/* Subtítulo */}
-        <p style={{ color: '#FDB931', margin: '5px 0 15px 0', fontSize: '0.8rem', letterSpacing: '4px', textTransform: 'uppercase', fontWeight: 'bold' }}>
-          REGISTRO UNIVERSAL PERMANENTE
-        </p>
-        {/* Contador Hackerman (Sin cajas, solo texto verde) */}
-        <div style={{ color: '#00FF00', fontSize: '0.75rem', fontFamily: 'monospace', textShadow: '0 0 5px #00FF00', letterSpacing: '1px' }}>
-          ● {estrellas.length} SEÑALES EN ÓRBITA
-        </div>
+        <h1 style={{ color: 'white', margin: 0, fontSize: 'clamp(2rem, 5vw, 4rem)', letterSpacing: '8px', fontWeight: '100', fontFamily: 'serif', textShadow: '0 0 50px rgba(255, 215, 0, 0.5)' }}>ETERNAL</h1>
+        <p style={{ color: '#FDB931', margin: '5px 0 15px 0', fontSize: '0.8rem', letterSpacing: '4px', textTransform: 'uppercase', fontWeight: 'bold' }}>REGISTRO UNIVERSAL PERMANENTE</p>
+        <div style={{ color: '#00FF00', fontSize: '0.75rem', fontFamily: 'monospace', textShadow: '0 0 5px #00FF00', letterSpacing: '1px' }}>● {estrellas.length} SEÑALES EN ÓRBITA</div>
       </div>
 
       <button onClick={toggleMusic} style={{ position: 'absolute', top: 30, left: 30, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.2)', color: 'white', padding: '10px', borderRadius: '50%', cursor: 'pointer', backdropFilter: 'blur(5px)', zIndex: 50 }}>
@@ -221,10 +226,15 @@ export default function App() {
           <h2 style={{ color: '#FDB931', fontFamily: 'serif', fontSize: '2.5rem', marginBottom: '30px', textAlign: 'center' }}>Selecciona tu Estatus</h2>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '25px', justifyContent: 'center', width: '100%', maxWidth: '1200px' }}>
             {CATALOGO.map((item) => (
-              <div key={item.id} style={{ background: `linear-gradient(145deg, rgba(255,255,255,0.03), ${item.color}08)`, border: `1px solid ${item.color}40`, borderRadius: '20px', padding: '30px', width: '100%', maxWidth: '280px', textAlign: 'center', boxShadow: `0 0 30px ${item.color}10`, display: 'flex', flexDirection: 'column', transform: (item.precio.includes('100') || item.precio.includes('Día')) ? 'scale(1.05)' : 'scale(1)', borderTop: `3px solid ${item.color}`, position: 'relative' }}>
+              <div key={item.id} style={{ background: `linear-gradient(145deg, rgba(255,255,255,0.03), ${item.color}08)`, border: `1px solid ${item.color}40`, borderRadius: '20px', padding: '30px', width: '100%', maxWidth: '280px', textAlign: 'center', boxShadow: `0 0 30px ${item.color}10`, display: 'flex', flexDirection: 'column', transform: (item.precio.includes('100') || item.precio.includes('Día') || item.id === 'esmeralda') ? 'scale(1.05)' : 'scale(1)', borderTop: `3px solid ${item.color}`, position: 'relative' }}>
                 <h3 style={{ color: item.color, margin: '0 0 10px 0', fontSize: '1.2rem', letterSpacing: '1px', textTransform: 'uppercase' }}>{item.nombre}</h3>
                 <p style={{ color: 'white', fontSize: (item.precio.includes('Día')) ? '1.8rem' : '2.5rem', fontWeight: '900', margin: '5px 0', textShadow: `0 0 15px ${item.color}` }}>{item.precio}</p>
-                <button onClick={() => window.location.href = item.link} style={{ background: item.color, color: item.color === '#FFD700' || item.color === '#00FF00' ? 'black' : 'white', border: 'none', padding: '15px 0', borderRadius: '30px', fontWeight: '900', cursor: 'pointer', width: '100%', fontSize: '1rem', marginTop: 'auto', boxShadow: `0 0 25px ${item.color}40` }}>ELEGIR PLAN</button>
+                <div style={{ margin: '20px 0', textAlign: 'left', flex: 1, borderTop: '1px solid rgba(255,255,255,0.1)', borderBottom: '1px solid rgba(255,255,255,0.1)', padding: '15px 0' }}>
+                    {item.features.map((feat, i) => ( <p key={i} style={{color: '#ddd', fontSize: '0.9rem', margin: '8px 0', display: 'flex', alignItems: 'center'}}><span style={{color: item.color, marginRight: '10px', fontSize: '1.2rem'}}>✓</span> {feat}</p> ))}
+                </div>
+                {/* DESCRIPCIONES MÁS GRANDES Y VISIBLES */}
+                <p style={{ color: '#eee', fontSize: '1rem', marginBottom: '25px', lineHeight: '1.4' }}>{item.desc}</p>
+                <button onClick={() => window.location.href = item.link} style={{ background: item.color, color: (item.color === '#FFD700' || item.color === '#00FF00' || item.color === '#00FF7F') ? 'black' : 'white', border: 'none', padding: '15px 0', borderRadius: '30px', fontWeight: '900', cursor: 'pointer', width: '100%', fontSize: '1rem', marginTop: 'auto', boxShadow: `0 0 25px ${item.color}40` }}>ELEGIR PLAN</button>
               </div>
             ))}
           </div>
@@ -250,7 +260,7 @@ export default function App() {
           <h2 style={{ color: estrellaSeleccionada.color, margin: '0 0 15px 0', fontSize: '2rem', fontFamily: 'serif', textShadow: `0 0 30px ${estrellaSeleccionada.color}` }}>{estrellaSeleccionada.nombre}</h2>
           <p style={{ fontStyle: 'italic', color: '#eee', marginBottom: '25px', lineHeight: '1.6', fontSize: '1.1rem' }}>"{estrellaSeleccionada.mensaje}"</p>
           <div style={{display: 'flex', flexDirection: 'column', gap: '10px'}}>
-            {estrellaSeleccionada.link && ( <button onClick={() => window.open(estrellaSeleccionada.link, '_blank')} style={{ width: '100%', padding: '18px', background: estrellaSeleccionada.color, color: estrellaSeleccionada.color === '#FFD700' ? 'black' : 'white', border: 'none', borderRadius: '15px', cursor: 'pointer', fontWeight: '900', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', boxShadow: `0 0 30px ${estrellaSeleccionada.color}60` }}><ExternalLink size={20} /> VISITAR</button> )}
+            {estrellaSeleccionada.link && ( <button onClick={() => window.open(estrellaSeleccionada.link, '_blank')} style={{ width: '100%', padding: '18px', background: estrellaSeleccionada.color, color: (estrellaSeleccionada.color === '#FFD700' || estrellaSeleccionada.color === '#00FF7F') ? 'black' : 'white', border: 'none', borderRadius: '15px', cursor: 'pointer', fontWeight: '900', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', boxShadow: `0 0 30px ${estrellaSeleccionada.color}60` }}><ExternalLink size={20} /> VISITAR</button> )}
             <button onClick={compartirEstrella} style={{ width: '100%', padding: '18px', background: 'rgba(255,255,255,0.15)', color: 'white', border: `1px solid ${estrellaSeleccionada.color}`, borderRadius: '15px', cursor: 'pointer', fontWeight: '900', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}><Share2 size={20} /> COMPARTIR (WhatsApp)</button>
           </div>
           <button onClick={() => setEstrellaSeleccionada(null)} style={{ marginTop: '15px', background: 'transparent', border: 'none', color: '#888', cursor: 'pointer', textDecoration: 'underline' }}>Cerrar</button>
